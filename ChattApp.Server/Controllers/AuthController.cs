@@ -16,7 +16,7 @@ public class AuthController(SignInManager<ChatUser> signInManager, UserManager<C
     private readonly ILogger<AuthController> _logger;
 
     [HttpPost]
-    [Route("/Register")]
+    [Route("register")]
 
     public async Task<IActionResult> Register(UserModel model)
     {
@@ -49,14 +49,14 @@ public class AuthController(SignInManager<ChatUser> signInManager, UserManager<C
     }
 
     [HttpPost]
-    [Route("/login")]
+    [Route("login")]
     public async Task<IActionResult> Login(UserModel model)
     {
         try
         {
             if (ModelState.IsValid)
             {
-                var signInResult = await _signInManager.PasswordSignInAsync(model.Email, model.UserName, false, false);
+                var signInResult = await _signInManager.PasswordSignInAsync(model.UserName,model.Password, false, false);
                 if (signInResult.Succeeded)
                 {
                     return Ok();
