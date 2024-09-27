@@ -3,14 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
 const LoginComponent = () => {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    const success = await login(email, password);
+    const success = await login(username, password);
     if (success) {
       navigate("/chat");
     }
@@ -21,12 +21,12 @@ const LoginComponent = () => {
       <h2>Login</h2>
       <form onSubmit={handleLogin}>
         <div className='form-group'>
-          <label>Email</label>
+          <label>Username</label>
           <input
-            type='email'
+            type='text'
             className='form-control'
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             required
           />
         </div>

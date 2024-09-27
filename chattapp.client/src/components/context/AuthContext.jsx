@@ -9,12 +9,12 @@ const AuthProvider = ({ children }) => {
   const [messages, setMessages] = useState([]);
   const navigate = useNavigate();
 
-  // Login-funktion
-  const login = async (email, password) => {
-    const response = await fetch("/api/login", {
+  // Login-funktion - använd userName och password här
+  const login = async (userName, password) => {
+    const response = await fetch("https://localhost:7039/api/Auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ userName, password }), // Använd userName
     });
 
     if (response.ok) {
@@ -27,16 +27,16 @@ const AuthProvider = ({ children }) => {
     return false;
   };
 
-  // Register-funktion
-  const register = async (email, password) => {
-    const response = await fetch("/api/register", {
+  // Register-funktion - använd email, username och password vid registrering
+  const register = async (email, userName, password) => {
+    const response = await fetch("https://localhost:7039/api/Auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, userName, password }), // Skicka alla tre fälten
     });
 
     if (response.ok) {
-      await login(email, password); // Logga in användaren efter registrering
+      await login(userName, password); // Logga in användaren efter registrering med användarnamn och lösenord
     }
   };
 
