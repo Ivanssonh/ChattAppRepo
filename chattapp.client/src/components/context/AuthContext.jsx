@@ -1,15 +1,12 @@
-import React, { createContext, useState, useEffect } from "react";
+import React, { createContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import * as signalR from "@microsoft/signalr";
 
 export const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [messages, setMessages] = useState([]);
+  const [user, setUser] = useState(""); // Hantera den inloggade användaren
   const navigate = useNavigate();
 
-  // Login-funktion - använd userName och password här
   const login = async (userName, password) => {
     const response = await fetch("https://localhost:7039/api/Auth/login", {
       method: "POST",
@@ -19,12 +16,18 @@ const AuthProvider = ({ children }) => {
 
     if (response.ok) {
       const data = await response.json();
-      setUser(data.user); // Spara användarinformation
-      localStorage.setItem("token", data.token);
+      const token = data.token; // Hämta token från svaret
+
+      sessionStorage.setItem("jwtToken", token); // Spara JWT-token i sessionStorage
+
+      setUser(userName); // Sätt användarnamnet (om det behövs)
       navigate("/chat"); // Navigera till chatten efter inloggning
       return true;
+    } else {
+      // Hantera om inloggningen misslyckades
+      console.error("Login failed with status:", response.status);
+      return false;
     }
-    return false;
   };
 
   // Register-funktion - använd email, username och password vid registrering
@@ -36,30 +39,12 @@ const AuthProvider = ({ children }) => {
     });
 
     if (response.ok) {
-      await login(userName, password); // Logga in användaren efter registrering med användarnamn och lösenord
+      navigate("/login"); // Navigera till login efter lyckad registrering
     }
   };
 
-  // Hantera SignalR för chatt
-  useEffect(() => {
-    if (user) {
-      const connection = new signalR.HubConnectionBuilder()
-        .withUrl("/chathub")
-        .withAutomaticReconnect()
-        .build();
-
-      connection.on("ReceiveMessage", (userName, message) => {
-        setMessages((prevMessages) => [...prevMessages, { userName, message }]);
-      });
-
-      connection.start();
-    }
-  }, [user]);
-
   return (
-    <AuthContext.Provider
-      value={{ user, login, register, messages, setMessages }}
-    >
+    <AuthContext.Provider value={{ user, login, register }}>
       {children}
     </AuthContext.Provider>
   );

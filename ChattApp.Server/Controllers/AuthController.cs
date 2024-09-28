@@ -1,9 +1,14 @@
 ﻿using ChattApp.Server.Domain.DTO;
 using ChattApp.Server.Domain.Identity;
+using ChattApp.Server.Domain.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace ChattApp.Server.Controllers;
 
@@ -34,7 +39,7 @@ public class AuthController(SignInManager<ChatUser> signInManager, UserManager<C
                     var registerResult = await _userManager.CreateAsync(chatUser, model.Password);
                     if (registerResult.Succeeded)
                     {
-                        return Created();
+                        return Ok();
                     }
                 }
             }
@@ -50,29 +55,57 @@ public class AuthController(SignInManager<ChatUser> signInManager, UserManager<C
 
     [HttpPost]
     [Route("login")]
-    public async Task<IActionResult> Login(UserModel model)
+    public async Task<IActionResult> Login(loginUserModel model)
     {
         try
         {
             if (ModelState.IsValid)
             {
-                var signInResult = await _signInManager.PasswordSignInAsync(model.UserName,model.Password, false, false);
+                var user = await _userManager.FindByNameAsync(model.UserName);  // Hämta användare baserat på användarnamn
+                if (user == null)
+                {
+                    return Unauthorized("Invalid username or password");
+                }
+
+                var signInResult = await _signInManager.PasswordSignInAsync(user.UserName!, model.Password, false, false);
                 if (signInResult.Succeeded)
                 {
-                    return Ok();
+                    var token = GenerateJwtToken(user);
+
+                    return Ok(new { token });
                 }
             }
-            return Unauthorized("Not a valid user");
+            return Unauthorized("Invalid username or password");
         }
-        catch (Exception ex )
+        catch (Exception ex)
         {
-
             _logger.LogError($"ERROR : AuthController:Login() :: {ex.Message}");
             return BadRequest();
         }
     }
 
-        
+
+    private static string GenerateJwtToken(ChatUser user)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var key = Encoding.ASCII.GetBytes("d5df9b30d5891d6e19c3eda79aef6fa0181cb5f0da195f2bbb54022c7d217b1b"); // private key
+
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(new Claim[]
+            {
+            new Claim(ClaimTypes.Name, user.UserName!) // Använd ChatUser
+            }),
+            Expires = DateTime.UtcNow.AddHours(2),
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+        };
+
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        return tokenHandler.WriteToken(token);
+    }
 }
+
+        
+
 
  

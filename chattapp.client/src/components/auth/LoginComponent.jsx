@@ -41,7 +41,12 @@ const LoginComponent = () => {
           />
         </div>
         <button className='btn btn-primary mt-3'>Login</button>
-        <button className='btn btn-primary mt-3'>Register</button>
+        <button
+          className='btn btn-primary mt-3'
+          onClick={() => navigate("/register")}
+        >
+          Register
+        </button>
       </form>
     </div>
   );
