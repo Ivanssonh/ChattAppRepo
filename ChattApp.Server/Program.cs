@@ -20,6 +20,14 @@ builder.Services.AddDefaultIdentity<ChatUser>(x =>
 
 }).AddEntityFrameworkStores<ChatDbContext>();
 
+builder.Services.AddCors(options =>
+{
+options.AddPolicy("AllowAll", builder =>
+    builder.AllowAnyOrigin()
+           .AllowAnyHeader()
+           .AllowAnyMethod());
+});
+
 var app = builder.Build();
 
 app.UseDefaultFiles();
@@ -31,6 +39,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseCors("AllowAll");
+
 
 app.UseHttpsRedirection();
 app.UseAuthorization();

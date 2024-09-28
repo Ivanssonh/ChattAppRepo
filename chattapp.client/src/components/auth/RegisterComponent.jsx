@@ -9,7 +9,7 @@ const RegisterComponent = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await register(email, password);
+    await register(email, username, password);
   };
 
   return (

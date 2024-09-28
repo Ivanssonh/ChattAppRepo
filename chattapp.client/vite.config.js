@@ -1,5 +1,4 @@
 import { fileURLToPath, URL } from 'node:url';
-
 import { defineConfig } from 'vite';
 import plugin from '@vitejs/plugin-react';
 import fs from 'fs';
@@ -7,6 +6,7 @@ import path from 'path';
 import child_process from 'child_process';
 import { env } from 'process';
 
+// Hantering av certifikat för HTTPS-utvecklingsmiljö
 const baseFolder =
     env.APPDATA !== undefined && env.APPDATA !== ''
         ? `${env.APPDATA}/ASP.NET/https`
@@ -33,7 +33,7 @@ if (!fs.existsSync(certFilePath) || !fs.existsSync(keyFilePath)) {
 const target = env.ASPNETCORE_HTTPS_PORT ? `https://localhost:${env.ASPNETCORE_HTTPS_PORT}` :
     env.ASPNETCORE_URLS ? env.ASPNETCORE_URLS.split(';')[0] : 'https://localhost:7039';
 
-// https://vitejs.dev/config/
+// Vite-konfiguration
 export default defineConfig({
     plugins: [plugin()],
     resolve: {
@@ -43,15 +43,16 @@ export default defineConfig({
     },
     server: {
         proxy: {
-            '^/weatherforecast': {
+            '^/api': { // Proxy för alla anrop som börjar med /api
                 target,
-                secure: false
+                secure: false, // Eftersom certifikaten är självsignerade
+                changeOrigin: true // För att hantera CORS-problem
             }
         },
-        port: 5173,
+        port: 5173, // Frontendens port
         https: {
-            key: fs.readFileSync(keyFilePath),
-            cert: fs.readFileSync(certFilePath),
+            key: fs.readFileSync(keyFilePath), // Läser certifikatnyckeln
+            cert: fs.readFileSync(certFilePath), // Läser certifikatet
         }
     }
 })
