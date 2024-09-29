@@ -1,45 +1,45 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import * as signalR from "@microsoft/signalr";
 import DOMPurify from "dompurify";
 
 const ChatComponent = () => {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
-  const [connection, setConnection] = useState(null);
+  const connectionRef = useRef(null); // Använd ref för att hålla anslutningen
   const [username, setUsername] = useState(null);
-  const [authorized, setAuthorized] = useState(false); // Hanterar behörighet
+  const [authorized, setAuthorized] = useState(false);
 
   useEffect(() => {
     const token = sessionStorage.getItem("jwtToken");
     console.log("JWT Token:", token);
 
-    if (token && !connection) {
+    if (token && !connectionRef.current) {
       const decodedJwt = JSON.parse(atob(token.split(".")[1]));
-      setUsername(decodedJwt.unique_name); // Sätt användarnamnet från JWT-token
+      setUsername(decodedJwt.unique_name);
       setAuthorized(true);
 
       const newConnection = new signalR.HubConnectionBuilder()
         .withUrl("https://localhost:7039/chathub", {
-          accessTokenFactory: () => token, // Skicka JWT-token med varje förfrågan
+          accessTokenFactory: () => token,
         })
         .withAutomaticReconnect()
         .build();
 
-      setConnection(newConnection);
+      connectionRef.current = newConnection;
 
       newConnection
         .start()
         .then(() => {
           console.log("Connected to the hub.");
 
-          // Lyssna efter meddelanden från andra klienter
-          newConnection.on("ReceiveMessage", (userName, message) => {
+          newConnection.on("ReceiveMessage", (userName, message, timestamp) => {
             console.log("Received message from:", userName, message);
             setMessages((prevMessages) => [
               ...prevMessages,
               {
                 user: userName,
                 message: DOMPurify.sanitize(message, { ALLOWED_TAGS: ["b"] }),
+                timestamp,
               },
             ]);
           });
@@ -47,25 +47,21 @@ const ChatComponent = () => {
         .catch((err) => console.error("Connection error:", err));
     }
 
-    // Cleanup anslutningen vid unmount
     return () => {
-      if (connection) {
-        connection.stop().then(() => console.log("SignalR connection stopped"));
+      if (connectionRef.current) {
+        connectionRef.current
+          .stop()
+          .then(() => console.log("SignalR connection stopped"));
+        connectionRef.current = null; // Rensa anslutningen
       }
     };
-  }, [connection]); // Se till att useEffect endast körs om connection ändrase till att useEffect endast körs om connection ändras
+  }, []); // Se till att detta endast körs en gång
 
   const sendMessage = async () => {
-    if (connection && message.trim()) {
+    if (connectionRef.current && message.trim()) {
       try {
-        await connection.send("SendMessage", message);
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          {
-            user: "You",
-            message: DOMPurify.sanitize(message, { ALLOWED_TAGS: ["b"] }),
-          },
-        ]);
+        await connectionRef.current.send("SendMessage", message);
+        console.log("Message sent:", message);
         setMessage(""); // Rensa meddelandefältet
       } catch (err) {
         console.error("Failed to send message:", err);
@@ -80,12 +76,12 @@ const ChatComponent = () => {
   };
 
   const logOut = () => {
-    if (connection) {
-      connection
+    if (connectionRef.current) {
+      connectionRef.current
         .stop()
         .then(() => {
           sessionStorage.removeItem("jwtToken");
-          window.location.href = "/";
+          window.location.href = "/login";
         })
         .catch((err) => console.error("Error while stopping connection:", err));
     } else {
@@ -122,7 +118,10 @@ const ChatComponent = () => {
             >
               {messages.map((msg, index) => (
                 <div key={index} className='mb-3'>
-                  <strong>{msg.user}:</strong> {msg.message}
+                  <strong>{msg.user}:</strong> {msg.message}{" "}
+                  <span className='text-muted' style={{ fontSize: "0.8rem" }}>
+                    ({msg.timestamp})
+                  </span>
                 </div>
               ))}
             </div>
@@ -135,12 +134,12 @@ const ChatComponent = () => {
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  disabled={!connection} // Inaktivera input om anslutningen inte finns
+                  disabled={!connectionRef.current} // Inaktivera input om anslutningen inte finns
                 />
                 <button
                   className='btn btn-primary'
                   onClick={sendMessage}
-                  disabled={!connection || !message.trim()}
+                  disabled={!connectionRef.current || !message.trim()}
                 >
                   Send
                 </button>

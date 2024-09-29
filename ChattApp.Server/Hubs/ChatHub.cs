@@ -7,23 +7,29 @@ using Microsoft.EntityFrameworkCore;
 namespace ChattApp.Server.Hubs;
 
 [Authorize]  // Endast inloggade användare får tillgång
-public class ChatHub(ChatDbContext context) : Hub
+public class ChatHub : Hub
 {
-    private readonly ChatDbContext _context = context;
+    private readonly ChatDbContext _context;
+
+    // Konstruktor för att injicera ChatDbContext
+    public ChatHub(ChatDbContext context)
+    {
+        _context = context;
+    }
 
     // Vid anslutning, skicka de senaste meddelandena till den nya klienten
     public override async Task OnConnectedAsync()
     {
-        // Hämta de senaste 50 meddelandena och inkludera användarinformation
+        // Hämta de senaste 20 meddelandena och inkludera användarinformation
         var messages = await _context.ChatMessages
             .Include(m => m.User)  // Ladda användarinformation
-            .OrderBy(m => m.Timestamp)
+            .OrderByDescending(m => m.Timestamp)
             .Take(20)
             .ToListAsync();
 
-        foreach (var message in messages)
+        // Skicka meddelandena till den anslutande klienten
+        foreach (var message in messages.OrderBy(m => m.Timestamp))  // Sortera meddelanden i rätt ordning
         {
-            // Skicka meddelandet med användarnamnet, själva meddelandet och tidsstämpeln
             await Clients.Caller.SendAsync("ReceiveMessage", message.User.UserName, message.Message, message.Timestamp.ToString("yyyy-MM-dd HH:mm:ss"));
         }
 
@@ -34,10 +40,11 @@ public class ChatHub(ChatDbContext context) : Hub
     public async Task SendMessage(string message)
     {
         // Hämta användarnamn från SignalR:s context
-        var userName = Context.User?.Identity?.Name;  // Kontrollera att användarnamnet finns
+        var userName = Context.User?.Identity?.Name;
+
         if (string.IsNullOrEmpty(userName))
         {
-            throw new HubException("Användaren är inte inloggad");
+            throw new HubException("Användaren är inte inloggad.");
         }
 
         // Hämta användarens ID från SignalR:s context
@@ -45,7 +52,7 @@ public class ChatHub(ChatDbContext context) : Hub
 
         if (string.IsNullOrEmpty(userId))
         {
-            throw new HubException("User identifier not found");
+            throw new HubException("User identifier not found.");
         }
 
         // Skapa ett nytt meddelande och spara UserId istället för UserName
@@ -60,7 +67,7 @@ public class ChatHub(ChatDbContext context) : Hub
         _context.ChatMessages.Add(chatMessage);
         await _context.SaveChangesAsync();
 
-        // Skicka meddelandet till alla klienter med användarnamnet och meddelandet
-        await Clients.Others.SendAsync("ReceiveMessage", userName, message);
+        // Skicka meddelandet till alla andra klienter
+        await Clients.All.SendAsync("ReceiveMessage", userName, message, chatMessage.Timestamp.ToString("yyyy-MM-dd HH:mm:ss"));
     }
 }

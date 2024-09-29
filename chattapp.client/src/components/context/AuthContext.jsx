@@ -20,7 +20,7 @@ const AuthProvider = ({ children }) => {
 
       sessionStorage.setItem("jwtToken", token); // Spara JWT-token i sessionStorage
 
-      setUser(userName); // Sätt användarnamnet (om det behövs)
+      setUser(userName); // Sätt användarnamnet
       navigate("/chat"); // Navigera till chatten efter inloggning
       return true;
     } else {
