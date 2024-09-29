@@ -31,6 +31,18 @@ const ChatComponent = () => {
         .start()
         .then(() => {
           console.log("Connected to the hub.");
+
+          // Lyssna efter meddelanden från andra klienter
+          newConnection.on("ReceiveMessage", (userName, message) => {
+            console.log("Received message from:", userName, message);
+            setMessages((prevMessages) => [
+              ...prevMessages,
+              {
+                user: userName,
+                message: DOMPurify.sanitize(message, { ALLOWED_TAGS: ["b"] }),
+              },
+            ]);
+          });
         })
         .catch((err) => console.error("Connection error:", err));
     }
@@ -41,12 +53,12 @@ const ChatComponent = () => {
         connection.stop().then(() => console.log("SignalR connection stopped"));
       }
     };
-  }, [connection]); // Se till att useEffect endast körs om connection ändras
+  }, [connection]); // Se till att useEffect endast körs om connection ändrase till att useEffect endast körs om connection ändras
 
   const sendMessage = async () => {
     if (connection && message.trim()) {
       try {
-        await connection.send("SendMessage", username, message);
+        await connection.send("SendMessage", message);
         setMessages((prevMessages) => [
           ...prevMessages,
           {

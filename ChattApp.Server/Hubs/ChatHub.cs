@@ -18,7 +18,7 @@ public class ChatHub(ChatDbContext context) : Hub
         var messages = await _context.ChatMessages
             .Include(m => m.User)  // Ladda användarinformation
             .OrderBy(m => m.Timestamp)
-            .Take(50)
+            .Take(20)
             .ToListAsync();
 
         foreach (var message in messages)
@@ -61,6 +61,6 @@ public class ChatHub(ChatDbContext context) : Hub
         await _context.SaveChangesAsync();
 
         // Skicka meddelandet till alla klienter med användarnamnet och meddelandet
-        await Clients.All.SendAsync("ReceiveMessage", userName, message);
+        await Clients.Others.SendAsync("ReceiveMessage", userName, message);
     }
 }
