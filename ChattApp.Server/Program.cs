@@ -25,7 +25,7 @@ builder.Services.AddDefaultIdentity<ChatUser>(x =>
 
 builder.Services.AddCors(options =>
 {
-options.AddPolicy("AllowAll", builder =>
+options.AddPolicy("AllowAddresses", builder =>
     builder.WithOrigins("https://localhost:5173")
            .AllowAnyHeader()
            .AllowAnyMethod()
@@ -40,18 +40,18 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = false,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("d5df9b30d5891d6e19c3eda79aef6fa0181cb5f0da195f2bbb54022c7d217b1b")) // Replace with your secret key
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("d5df9b30d5891d6e19c3eda79aef6fa0181cb5f0da195f2bbb54022c7d217b1b")) 
         };
 
-        // Handle the JWT in the SignalR connection
+        
         options.Events = new JwtBearerEvents
         {
             OnMessageReceived = context =>
             {
-                // Check for the access token in the query string
+                
                 var accessToken = context.Request.Query["access_token"];
 
-                // If found, set it
+                
                 if (!string.IsNullOrEmpty(accessToken) && context.HttpContext.Request.Path.StartsWithSegments("/chathub"))
                 {
                     context.Token = accessToken;
@@ -64,10 +64,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.WebHost.ConfigureKestrel(options =>
 {
-    options.ListenAnyIP(5215); // HTTP
+    options.ListenAnyIP(5215); 
     options.ListenAnyIP(7039, listenOptions =>
     {
-        listenOptions.UseHttps(); // HTTPS
+        listenOptions.UseHttps(); 
     });
 });
 
@@ -85,7 +85,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-app.UseCors("AllowAll");
+app.UseCors("AllowAddresses");
 
 
 app.UseHttpsRedirection();

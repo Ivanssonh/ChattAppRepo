@@ -7,13 +7,23 @@ const RegisterComponent = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const { register } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await register(email, username, password);
-    navigate("/login");
+    try {
+      const response = await register(email, username, password);
+      if (response.ok) {
+        navigate("/login");
+      } else {
+        const errorData = await response.json();
+        setErrorMessage(errorData.message || "Registration failed");
+      }
+    } catch (error) {
+      setErrorMessage("Something went wrong. Please try again.");
+    }
   };
 
   return (
@@ -25,6 +35,7 @@ const RegisterComponent = () => {
       <div className='form-div container'>
         <h1>Register</h1>
         <form onSubmit={handleSubmit} className='form'>
+          {errorMessage && <p className='alert alert-danger'>{errorMessage}</p>}
           <div className='form-group'>
             <label className='form-label'>Email</label>
             <input

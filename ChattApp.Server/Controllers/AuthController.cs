@@ -61,7 +61,7 @@ public class AuthController(SignInManager<ChatUser> signInManager, UserManager<C
         {
             if (ModelState.IsValid)
             {
-                var user = await _userManager.FindByNameAsync(model.UserName);  // Hämta användare baserat på användarnamn
+                var user = await _userManager.FindByNameAsync(model.UserName); 
                 if (user == null)
                 {
                     return Unauthorized("Invalid username or password");
@@ -88,7 +88,7 @@ public class AuthController(SignInManager<ChatUser> signInManager, UserManager<C
     private static string GenerateJwtToken(ChatUser user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes("d5df9b30d5891d6e19c3eda79aef6fa0181cb5f0da195f2bbb54022c7d217b1b"); // private key
+        var key = Encoding.ASCII.GetBytes("d5df9b30d5891d6e19c3eda79aef6fa0181cb5f0da195f2bbb54022c7d217b1b"); 
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {

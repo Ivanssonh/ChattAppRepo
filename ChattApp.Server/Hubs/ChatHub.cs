@@ -6,18 +6,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ChattApp.Server.Hubs;
 
-[Authorize]  // Endast inloggade användare får tillgång
-public class ChatHub : Hub
+[Authorize] 
+public class ChatHub(ChatDbContext context) : Hub
 {
-    private readonly ChatDbContext _context;
+    private readonly ChatDbContext _context = context;
 
-    // Konstruktor för att injicera ChatDbContext
-    public ChatHub(ChatDbContext context)
-    {
-        _context = context;
-    }
-
-    // Vid anslutning, skicka de senaste meddelandena till den nya klienten
     public override async Task OnConnectedAsync()
     {
         // Hämta de senaste 20 meddelandena och inkludera användarinformation
