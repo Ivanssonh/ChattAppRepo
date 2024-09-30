@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import * as signalR from "@microsoft/signalr";
 import DOMPurify from "dompurify";
+import "./ChatComponent.css";
 
 const ChatComponent = () => {
   const [message, setMessage] = useState("");
@@ -112,16 +113,11 @@ const ChatComponent = () => {
                 Log Out
               </button>
             </div>
-            <div
-              className='card-body chat-window'
-              style={{ height: "300px", overflowY: "scroll" }}
-            >
+            <div className='card-body chat-window'>
               {messages.map((msg, index) => (
                 <div key={index} className='mb-3'>
                   <strong>{msg.user}:</strong> {msg.message}{" "}
-                  <span className='text-muted' style={{ fontSize: "0.8rem" }}>
-                    ({msg.timestamp})
-                  </span>
+                  <span className='text-muted'>({msg.timestamp})</span>
                 </div>
               ))}
             </div>
