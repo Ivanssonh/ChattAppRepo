@@ -1,12 +1,12 @@
 import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import "./LoginComponent.css"; // Importera din CSS-fil
+import "./LoginComponent.css";
 
 const LoginComponent = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [errorMessage, setErrorMessage] = useState(""); // Ny state för felmeddelande
+  const [errorMessage, setErrorMessage] = useState("");
   const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 

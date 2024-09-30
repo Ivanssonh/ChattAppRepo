@@ -6,7 +6,7 @@ import "./ChatComponent.css";
 const ChatComponent = () => {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
-  const connectionRef = useRef(null); // Använd ref för att hålla anslutningen
+  const connectionRef = useRef(null);
   const [username, setUsername] = useState(null);
   const [authorized, setAuthorized] = useState(false);
 
@@ -53,17 +53,17 @@ const ChatComponent = () => {
         connectionRef.current
           .stop()
           .then(() => console.log("SignalR connection stopped"));
-        connectionRef.current = null; // Rensa anslutningen
+        connectionRef.current = null;
       }
     };
-  }, []); // Se till att detta endast körs en gång
+  }, []);
 
   const sendMessage = async () => {
     if (connectionRef.current && message.trim()) {
       try {
         await connectionRef.current.send("SendMessage", message);
         console.log("Message sent:", message);
-        setMessage(""); // Rensa meddelandefältet
+        setMessage("");
       } catch (err) {
         console.error("Failed to send message:", err);
       }
@@ -129,8 +129,8 @@ const ChatComponent = () => {
                   placeholder='Type a message...'
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  disabled={!connectionRef.current} // Inaktivera input om anslutningen inte finns
+                  onKeyDown={handleKeyPress}
+                  disabled={!connectionRef.current}
                 />
                 <button
                   className='btn btn-primary'

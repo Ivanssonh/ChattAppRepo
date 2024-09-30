@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import "./RegisterComponent.css"; // Importera din CSS-fil
+import "./RegisterComponent.css";
 
 const RegisterComponent = () => {
   const [email, setEmail] = useState("");
@@ -13,7 +13,7 @@ const RegisterComponent = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     await register(email, username, password);
-    navigate("/login"); // Navigera till login efter registrering
+    navigate("/login");
   };
 
   return (
@@ -23,7 +23,7 @@ const RegisterComponent = () => {
         <div className='form-header-text'></div>
       </div>
       <div className='form-div container'>
-        <h1>Sign Up</h1>
+        <h1>Register</h1>
         <form onSubmit={handleSubmit} className='form'>
           <div className='form-group'>
             <label className='form-label'>Email</label>
@@ -59,7 +59,7 @@ const RegisterComponent = () => {
             />
           </div>
           <button type='submit' className='btn btn-primary mt-3'>
-            Sign Up
+            Register
           </button>
         </form>
         <p>
