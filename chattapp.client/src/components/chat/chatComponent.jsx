@@ -127,7 +127,7 @@ const ChatComponent = () => {
                 disabled={!connectionRef.current}
               />
               <button
-                className='btn btn-primary'
+                className='btn btn-primary btn-primary-chat'
                 id='btn-send'
                 onClick={sendMessage}
                 disabled={!connectionRef.current || !message.trim()}
