@@ -12,7 +12,6 @@ const ChatComponent = () => {
 
   useEffect(() => {
     const token = sessionStorage.getItem("jwtToken");
-    console.log("JWT Token:", token);
 
     if (token && !connectionRef.current) {
       const decodedJwt = JSON.parse(atob(token.split(".")[1]));
@@ -34,7 +33,6 @@ const ChatComponent = () => {
           console.log("Connected to the hub.");
 
           newConnection.on("ReceiveMessage", (userName, message, timestamp) => {
-            console.log("Received message from:", userName, message);
             setMessages((prevMessages) => [
               ...prevMessages,
               {
@@ -62,7 +60,6 @@ const ChatComponent = () => {
     if (connectionRef.current && message.trim()) {
       try {
         await connectionRef.current.send("SendMessage", message);
-        console.log("Message sent:", message);
         setMessage("");
       } catch (err) {
         console.error("Failed to send message:", err);
@@ -85,9 +82,6 @@ const ChatComponent = () => {
           window.location.href = "/login";
         })
         .catch((err) => console.error("Error while stopping connection:", err));
-    } else {
-      sessionStorage.removeItem("jwtToken");
-      window.location.href = "/";
     }
   };
 
@@ -100,46 +94,46 @@ const ChatComponent = () => {
   }
 
   return (
-    <div className='container mt-4'>
-      <div className='row'>
-        <div className='col-12'>
-          <div className='card'>
-            <div className='card-header bg-primary text-white'>
-              <h5>Chat - Logged in as {username}</h5>
-              <button
-                onClick={logOut}
-                className='btn btn-danger btn-sm float-end'
-              >
-                Log Out
-              </button>
-            </div>
-            <div className='card-body chat-window'>
-              {messages.map((msg, index) => (
-                <div key={index} className='mb-3'>
-                  <strong>{msg.user}:</strong> {msg.message}{" "}
-                  <span className='text-muted'>({msg.timestamp})</span>
-                </div>
-              ))}
-            </div>
-            <div className='card-footer'>
-              <div className='input-group'>
-                <input
-                  type='text'
-                  className='form-control'
-                  placeholder='Type a message...'
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  onKeyDown={handleKeyPress}
-                  disabled={!connectionRef.current}
-                />
-                <button
-                  className='btn btn-primary'
-                  onClick={sendMessage}
-                  disabled={!connectionRef.current || !message.trim()}
-                >
-                  Send
-                </button>
+    <div className='container container-chatwindow'>
+      <div>
+        <div className='card'>
+          <div className='card-header card-header-top'>
+            <h2>Henkes Chatroom</h2>
+          </div>
+          <div className='card-header card-loggedin bg-light'>
+            Logged in as {username}
+            <button onClick={logOut} className='btn-danger btn-logout'>
+              Log Out
+            </button>
+          </div>
+
+          <div className='card-body chat-window'>
+            {messages.map((msg, index) => (
+              <div key={index} className='mb-3'>
+                <strong>{msg.user}:</strong> {msg.message}{" "}
               </div>
+            ))}
+          </div>
+          <div className='card-footer'>
+            <div className='input-group'>
+              <input
+                type='text'
+                className='form-control'
+                id='form-text'
+                placeholder='Type a message...'
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyDown={handleKeyPress}
+                disabled={!connectionRef.current}
+              />
+              <button
+                className='btn btn-primary'
+                id='btn-send'
+                onClick={sendMessage}
+                disabled={!connectionRef.current || !message.trim()}
+              >
+                Send
+              </button>
             </div>
           </div>
         </div>
