@@ -13,20 +13,23 @@ public class ChatHub(ChatDbContext context) : Hub
 
     public override async Task OnConnectedAsync()
     {
-        // Hämta de senaste 20 meddelandena och inkludera användarinformation
-        var messages = await _context.ChatMessages
+        if (Context.User?.Identity != null && Context.User.Identity.IsAuthenticated)
+        {
+            // Hämta de senaste 20 meddelandena och inkludera användarinformation
+            var messages = await _context.ChatMessages
             .Include(m => m.User)  // Ladda användarinformation
             .OrderByDescending(m => m.Timestamp)
             .Take(20)
             .ToListAsync();
 
-        // Skicka meddelandena till den anslutande klienten
-        foreach (var message in messages.OrderBy(m => m.Timestamp))  // Sortera meddelanden i rätt ordning
-        {
-            await Clients.Caller.SendAsync("ReceiveMessage", message.User.UserName, message.Message, message.Timestamp.ToString("yyyy-MM-dd HH:mm:ss"));
-        }
+            // Skicka meddelandena till den anslutande klienten
+            foreach (var message in messages.OrderBy(m => m.Timestamp))  // Sortera meddelanden i rätt ordning
+            {
+                await Clients.Caller.SendAsync("ReceiveMessage", message.User.UserName, message.Message, message.Timestamp.ToString("yyyy-MM-dd HH:mm:ss"));
+            }
 
-        await base.OnConnectedAsync();
+            await base.OnConnectedAsync();
+        }
     }
 
     // När ett meddelande skickas av en klient

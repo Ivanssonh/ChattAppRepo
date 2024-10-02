@@ -6,3 +6,4 @@ namespace ChattApp.Server.Domain.Identity;
 public class ChatUser : IdentityUser
 {
     ICollection<ChatMessageEntity> Messages { get; set; } = null!;
+}
