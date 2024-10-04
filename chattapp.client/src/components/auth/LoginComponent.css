@@ -1,79 +1,77 @@
 .form-container {
-    margin: 0 auto;
-    padding: 20px;
-    max-width: 500px;
-    margin-top: 10%;
-    border-radius: 10px;
-    background-color:rgba(255, 255, 255, 0.567)    
-  }
-  .form-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
+  margin: 0 auto;
+  padding: 20px;
+  max-width: 500px;
+  margin-top: 10%;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.415);
+}
+.form-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.back-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
 
-  }
-  .back-button {
-    background: none;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .form-header-text h5 {
-    margin: 0;
-  }
-  
-  .form-div h1 {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  
-  .form-group {
-    margin-bottom: 15px;
-  }
-  
-  .form-label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-  }
-  
-  .form-control {
-    width: 100%;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-  }
-  
-  .btn {
-    width: 100%;
-    padding: 10px;
-    background-color: #007bff;
-    border: none;
-    color: white;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .btn:hover {
-    background-color: #0056b3;
-  }
-  
-  .span-link {
-    color: #007bff;
-    cursor: pointer;
-    text-decoration: underline;
-  }
-  
-  .span-link:hover {
-    color: #0056b3;
-  }
-  
-  .alert {
-    padding: 10px;
-    background-color: #f8d7da;
-    color: #721c24;
-    margin-bottom: 15px;
-    border-radius: 5px;
-    border: 1px solid #f5c6cb;
-  }
-  
+.form-header-text h5 {
+  margin: 0;
+}
+
+.form-div h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.form-control {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+.btn {
+  width: 100%;
+  padding: 10px;
+  background-color: #007bff5e;
+  border: none;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background-color: #0056b3;
+}
+
+.span-link {
+  color: #007bff;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.span-link:hover {
+  color: #0056b3;
+}
+
+.alert {
+  padding: 10px;
+  background-color: #f8d7da;
+  color: #721c24;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  border: 1px solid #f5c6cb;
+}

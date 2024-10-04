@@ -9,6 +9,11 @@ const ChatComponent = () => {
   const connectionRef = useRef(null);
   const [username, setUsername] = useState(null);
   const [authorized, setAuthorized] = useState(false);
+  const endOfMessagesRef = useRef(null);
+
+  const scrollToBottom = () => {
+    endOfMessagesRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   useEffect(() => {
     const token = sessionStorage.getItem("jwtToken");
@@ -56,6 +61,10 @@ const ChatComponent = () => {
     };
   }, []);
 
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
   const sendMessage = async () => {
     if (connectionRef.current && message.trim()) {
       try {
@@ -87,48 +96,55 @@ const ChatComponent = () => {
 
   if (!authorized) {
     return (
-      <div>
-        <p>You are not authorized! ⛔</p>
+      <div className="not-authorized">
+        <div>
+          <h1>You are not authorized to use Henkes Chatroom! ⛔⛔⛔⛔</h1>
+          <i>
+            please login or email support@henkeschat.se if u have any questions
+          </i>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className='container container-chatwindow'>
+    <div className="container container-chatwindow">
       <div>
-        <div className='card'>
-          <div className='card-header card-header-top'>
+        <div className="card">
+          <div className="card-header card-header-top">
             <h2>Henkes Chatroom</h2>
           </div>
-          <div className='card-header card-loggedin bg-light'>
+          <div className="card-header card-loggedin bg-light">
             Logged in as {username}
-            <button onClick={logOut} className='btn-danger btn-logout'>
+            <button onClick={logOut} className="btn-danger btn-logout">
               Log Out
             </button>
           </div>
 
-          <div className='card-body chat-window'>
+          <div className="card-body chat-window">
             {messages.map((msg, index) => (
-              <div key={index} className='mb-3'>
+              <div key={index} className="mb-3">
                 <strong>{msg.user}:</strong> {msg.message}{" "}
               </div>
             ))}
+            {/* Den här div-elementet används för att scrolla till botten */}
+            <div ref={endOfMessagesRef} />
           </div>
-          <div className='card-footer'>
-            <div className='input-group'>
+          <div className="card-footer">
+            <div className="input-group">
               <input
-                type='text'
-                className='form-control'
-                id='form-text'
-                placeholder='Type a message...'
+                type="text"
+                className="form-control"
+                id="form-text"
+                placeholder="Type a message..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyDown={handleKeyPress}
                 disabled={!connectionRef.current}
               />
               <button
-                className='btn btn-primary btn-primary-chat'
-                id='btn-send'
+                className="btn btn-primary btn-primary-chat"
+                id="btn-send"
                 onClick={sendMessage}
                 disabled={!connectionRef.current || !message.trim()}
               >
