@@ -23,21 +23,20 @@ const ChatComponent = () => {
       setUsername(decodedJwt.unique_name);
       setAuthorized(true);
 
-      const newConnection = new signalR.HubConnectionBuilder()
+      const Connection = new signalR.HubConnectionBuilder()
         .withUrl("https://localhost:7039/chathub", {
           accessTokenFactory: () => token,
         })
         .withAutomaticReconnect()
         .build();
 
-      connectionRef.current = newConnection;
+      connectionRef.current = Connection;
 
-      newConnection
-        .start()
+      Connection.start()
         .then(() => {
           console.log("Connected to the hub.");
 
-          newConnection.on("ReceiveMessage", (userName, message, timestamp) => {
+          Connection.on("ReceiveMessage", (userName, message, timestamp) => {
             setMessages((prevMessages) => [
               ...prevMessages,
               {
@@ -127,7 +126,7 @@ const ChatComponent = () => {
                 <strong>{msg.user}:</strong> {msg.message}{" "}
               </div>
             ))}
-            {/* Den här div-elementet används för att scrolla till botten */}
+            {}
             <div ref={endOfMessagesRef} />
           </div>
           <div className="card-footer">
