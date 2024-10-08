@@ -1,16 +1,21 @@
+// Importer och initialisering av komponenter och kontext
 import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import "./RegisterComponent.css";
 
 const RegisterComponent = () => {
+  // State för e-post, användarnamn, lösenord och felmeddelanden
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
+  // Hämtar register-funktionen från AuthContext och för navigering
   const { register } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  // Funktion som hanterar registreringslogiken vid formulärskick
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {

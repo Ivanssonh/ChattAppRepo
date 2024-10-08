@@ -1,9 +1,11 @@
+// Importer och initialisering av komponenter och bibliotek
 import React, { useState, useEffect, useRef } from "react";
 import * as signalR from "@microsoft/signalr";
 import DOMPurify from "dompurify";
 import "./ChatComponent.css";
 
 const ChatComponent = () => {
+  // State och refs för hantering av meddelanden, anslutning och användarstatus
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const connectionRef = useRef(null);
@@ -11,10 +13,12 @@ const ChatComponent = () => {
   const [authorized, setAuthorized] = useState(false);
   const endOfMessagesRef = useRef(null);
 
+  // Scrollfunktion för att automatiskt scrolla till botten av chatten
   const scrollToBottom = () => {
     endOfMessagesRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  // useEffect: Etablerar SignalR-anslutning vid inloggning
   useEffect(() => {
     const token = sessionStorage.getItem("jwtToken");
 
@@ -32,6 +36,7 @@ const ChatComponent = () => {
 
       connectionRef.current = Connection;
 
+      // Startar SignalR-anslutningen och hanterar inkommande meddelanden
       Connection.start()
         .then(() => {
           console.log("Connected to the hub.");
@@ -50,6 +55,7 @@ const ChatComponent = () => {
         .catch((err) => console.error("Connection error:", err));
     }
 
+    // Rensar anslutningen vid komponentens avslutande
     return () => {
       if (connectionRef.current) {
         connectionRef.current
@@ -60,10 +66,12 @@ const ChatComponent = () => {
     };
   }, []);
 
+  // Scrollar automatiskt till botten när nya meddelanden kommer in
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
+  // Funktion för att skicka meddelanden
   const sendMessage = async () => {
     if (connectionRef.current && message.trim()) {
       try {
@@ -75,12 +83,14 @@ const ChatComponent = () => {
     }
   };
 
+  // Funktion för att hantera Enter-tangenten vid meddelandeskrivning
   const handleKeyPress = (e) => {
     if (e.key === "Enter" && message.trim()) {
       sendMessage();
     }
   };
 
+  // Funktion för att logga ut användaren
   const logOut = () => {
     if (connectionRef.current) {
       connectionRef.current
@@ -93,6 +103,7 @@ const ChatComponent = () => {
     }
   };
 
+  // Returnerar ej tillåtna meddelande om användaren inte är auktoriserad
   if (!authorized) {
     return (
       <div className='not-authorized'>
@@ -105,7 +116,6 @@ const ChatComponent = () => {
       </div>
     );
   }
-
   return (
     <div className='container container-chatwindow'>
       <div>

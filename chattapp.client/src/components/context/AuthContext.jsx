@@ -1,12 +1,15 @@
+// Importer och initialisering av AuthContext
 import React, { createContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
+  // State för användarinformation och navigering
   const [user, setUser] = useState("");
   const navigate = useNavigate();
 
+  // Login-funktion: skickar inloggningsuppgifter till API och hanterar JWT-token
   const login = async (userName, password) => {
     const response = await fetch("https://localhost:7039/api/Auth/login", {
       method: "POST",
@@ -19,7 +22,6 @@ const AuthProvider = ({ children }) => {
       const token = data.token;
 
       sessionStorage.setItem("jwtToken", token);
-
       setUser(userName);
       navigate("/chat");
       return true;
@@ -29,7 +31,7 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-  // Register-funktion - använd email, username och password vid registrering
+  // Register-funktion: skickar registreringsuppgifter till API och navigerar till login
   const register = async (email, userName, password) => {
     const response = await fetch("https://localhost:7039/api/Auth/register", {
       method: "POST",

@@ -16,26 +16,32 @@ namespace ChattApp.Server.Controllers;
 [ApiController]
 public class AuthController(SignInManager<ChatUser> signInManager, UserManager<ChatUser> userManager, ILogger<AuthController> logger) : ControllerBase
 {
+    
     private readonly SignInManager<ChatUser> _signInManager = signInManager;
     private readonly UserManager<ChatUser> _userManager = userManager;
     private readonly ILogger<AuthController> _logger;
 
+    // Registreringsmetod - hanterar användarregistrering
     [HttpPost]
     [Route("register")]
-
     public async Task<IActionResult> Register(UserModel model)
     {
         try
         {
+            
             if (ModelState.IsValid)
             {
+                
                 if (!await _userManager.Users.AnyAsync(x => x.Email == model.Email))
                 {
+                    
                     var chatUser = new ChatUser
                     {
                         UserName = model.UserName,
                         Email = model.Email,
                     };
+
+                    
                     var registerResult = await _userManager.CreateAsync(chatUser, model.Password);
                     if (registerResult.Succeeded)
                     {
@@ -44,15 +50,16 @@ public class AuthController(SignInManager<ChatUser> signInManager, UserManager<C
                 }
             }
             return BadRequest();
-
         }
         catch (Exception ex)
         {
+            
             _logger.LogError($"ERROR : AuthController:Register() :: {ex.Message}");
             return BadRequest();
         }
     }
 
+    // Inloggningsmetod - hanterar användarinloggning
     [HttpPost]
     [Route("login")]
     public async Task<IActionResult> Login(loginUserModel model)
@@ -61,17 +68,19 @@ public class AuthController(SignInManager<ChatUser> signInManager, UserManager<C
         {
             if (ModelState.IsValid)
             {
-                var user = await _userManager.FindByNameAsync(model.UserName); 
+                // Hitta användaren baserat på användarnamnet
+                var user = await _userManager.FindByNameAsync(model.UserName);
                 if (user == null)
                 {
                     return Unauthorized("Invalid username or password");
                 }
 
+                // Försök att logga in användaren med lösenord
                 var signInResult = await _signInManager.PasswordSignInAsync(user.UserName!, model.Password, false, false);
                 if (signInResult.Succeeded)
                 {
+                    // Generera JWT-token för den inloggade användaren
                     var token = GenerateJwtToken(user);
-
                     return Ok(new { token });
                 }
             }
@@ -84,7 +93,7 @@ public class AuthController(SignInManager<ChatUser> signInManager, UserManager<C
         }
     }
 
-
+    // Metod för att generera JWT-token för autentiserad användare
     private static string GenerateJwtToken(ChatUser user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
@@ -94,8 +103,8 @@ public class AuthController(SignInManager<ChatUser> signInManager, UserManager<C
         {
             Subject = new ClaimsIdentity(new Claim[]
             {
-            new Claim(ClaimTypes.Name, user.UserName!),
-            new Claim(ClaimTypes.NameIdentifier, user.Id)
+                new Claim(ClaimTypes.Name, user.UserName!),
+                new Claim(ClaimTypes.NameIdentifier, user.Id)
             }),
             Expires = DateTime.UtcNow.AddHours(2),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -105,8 +114,3 @@ public class AuthController(SignInManager<ChatUser> signInManager, UserManager<C
         return tokenHandler.WriteToken(token);
     }
 }
-
-        
-
-
- 
