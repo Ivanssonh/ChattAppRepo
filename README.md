@@ -26,6 +26,7 @@ First, clone this repository to your local machine:
 
 ### 2.  Navigate to the Project Directory and install dependencies
 then, move to the client and do this commands.
+
 1.
 - cd ChattApp.client
 - npm install
