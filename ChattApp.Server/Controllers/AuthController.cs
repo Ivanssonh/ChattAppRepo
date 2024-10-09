@@ -19,7 +19,7 @@ public class AuthController(SignInManager<ChatUser> signInManager, UserManager<C
     
     private readonly SignInManager<ChatUser> _signInManager = signInManager;
     private readonly UserManager<ChatUser> _userManager = userManager;
-    private readonly ILogger<AuthController> _logger;
+    private readonly ILogger<AuthController> _logger = logger;
 
     // Registreringsmetod - hanterar användarregistrering
     [HttpPost]
