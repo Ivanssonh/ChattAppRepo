@@ -34,9 +34,15 @@ then, move to the client and do this commands.
 2.
 - cd ChattApp.server
 - dotnet build/restore
- 
+
 ------------------------------------------------------------
-### 3.  Run the project
+
+ ### 3. Installera HTTPS-certifikat (lokal utveckling)
+För att köra projektet med HTTPS, kör följande kommando:
+- dotnet dev-certs https --trust
+
+------------------------------------------------------------
+### 4.  Run the project
 
 Change your directory to either the client or server and run this commands:
 - cd ChattApp.client
