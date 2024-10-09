@@ -8,7 +8,7 @@ A real-time chat application built using **ASP.NET Core** for the backend and **
 
 Make sure you have the following installed:
 
-- .NET 6.0 SDK
+- .NET 8.0 SDK
 - Node.js 16.x or later
 - SQLite (or any other database if using a different one)
 
